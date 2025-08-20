@@ -4,7 +4,11 @@ python -m pip install Django
 ```
 
 ```commandline
-django-admin startproject
+django-admin startproject mysite
+```
+
+```commandline
+python manage.py startapp myapp
 ```
 
 
