@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -27,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,10 +35,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-'myapi.apps.MyapiConfig',
-'rest_framework',
+    'drf_spectacular',
+    'myapi.apps.MyapiConfig',
+    'rest_framework',
     'rest_framework_simplejwt',
-
 ]
 
 MIDDLEWARE = [
@@ -72,7 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -82,7 +79,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -102,7 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -113,7 +108,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -126,7 +120,42 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
+}
+
+# ---------------------------------------- CELERY ----------------------------------------
+
+# Брокер сообщений: Используется Redis для распределения задач между воркерами.
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/1")
+
+# Результаты задач: Сохраняются в отдельной Redis-базе.
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/2")
+
+# Маршрутизация задач:
+CELERY_TASK_ROUTES = {
+    "posts.tasks.*": {"queue": "posts"},  # Задачи из модуля posts.tasks направляются в очередь posts.
+}
+
+# Используется JSON для передачи данных задач и их результатов.
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+# В режиме разработки (dev) задачи выполняются немедленно, что удобно для отладки.
+# CELERY_TASK_ALWAYS_EAGER = ENV == "dev"
+
+# Установлены таймауты и ограничения памяти для воркеров, чтобы избежать утечек ресурсов.
+CELERY_TIME_LIMIT = 60 * 60
+CELERY_WORKER_MAX_MEMORY_PER_CHILD = 1024 * 1024 * 300  # 300 MB
+
+# -------------------- Swagger ---------------------------
+# Настройки Swagger
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Heroes API',
+    'DESCRIPTION': 'API для управления героями',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # Другие опциональные настройки
 }
