@@ -1,4 +1,4 @@
-
+from .controllers import HeroController
 from .serializers import HeroSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -26,10 +26,10 @@ class HeroViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'], url_path='all')
     def get_all(self, request):
         """Получить всех героев"""
-        # heroes = self.get_queryset()
-        heroes = Hero.objects.all()
-        serializer = self.get_serializer(heroes, many=True)
-        return Response(serializer.data)
+
+        HeroController.get_all_heroes()
+
+        return Response(HeroController.get_all_heroes().data)
 
 
     @extend_schema(
