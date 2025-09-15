@@ -1,9 +1,15 @@
+import sys
+
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema
-from drf_spectacular.types import OpenApiTypes
+
 from .models import Hero
 from .serializers import HeroSerializer
+from .tasks import common_shared_task
+import logging
+logger = logging.getLogger(__name__)
 
 
 class HeroController:

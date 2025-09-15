@@ -1,15 +1,15 @@
-from .controllers import HeroController
-from .serializers import HeroSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from .controllers import HeroController
 from .models import Hero
+from .serializers import HeroSerializer
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
 
 class HeroViewSet(viewsets.ViewSet):
     queryset = Hero.objects.all().order_by('name')
@@ -30,7 +30,6 @@ class HeroViewSet(viewsets.ViewSet):
         HeroController.get_all_heroes()
 
         return Response(HeroController.get_all_heroes().data)
-
 
     @extend_schema(
         summary='Получить героя по ID',
@@ -60,11 +59,9 @@ class HeroViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+
 class HelloView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response({"message": f"Hello, {request.user.username}!"})
-from django.shortcuts import render
-
-# Create your views here.
